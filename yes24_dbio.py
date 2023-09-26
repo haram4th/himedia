@@ -42,6 +42,7 @@ def detail_page_info(urls):
     for index, url2 in enumerate(urls):
         print(f"{index}/{len(urls)} 세부정보 데이터 추출 중", end="\r")
         r2 = requests.get(url2)
+        time.sleep(5)
         soup2 = bs(r2.text, 'lxml')
         book_id = url2.split("/")[-1]
         if soup2.select_one("div.infoSetCont_wrap tr:nth-child(2) > td") != None:
