@@ -6,6 +6,8 @@ import pandas as pd  # 데이터 프레임 만듬
 from tqdm import tqdm
 import sqlite3
 from sqlalchemy import create_engine
+import dbinfo
+
 
 # book_list에서 책 1권의 정보를 추출하는 함수
 def extract_bookinfo(yy, mon, book_list):
@@ -69,7 +71,7 @@ def detail_page_info(urls):
         try:
             img_url = soup2.select_one("img.gImg")['src']
             book_img = session.get(img_url)
-            with open (f"./data/yes24/book_img/bcober_{book_id}.jpg","wb") as f:
+            with open (f"./yes24/book_img/bcober_{book_id}.jpg","wb") as f:
                     f.write(book_img.content)
                     print(f"bcober_{book_id}.jpg 파일을 생성하였습니다.", end="\r")
         except Exception as e:
@@ -110,7 +112,7 @@ def detail_page_info(urls):
         colname = ['book_id', 'page', 'weight', 'size', 'category', 'book_intro', 'pub_book_intro']
         temp = pd.DataFrame([result_detail], columns = colname)
         detail_result = pd.concat([detail_result, temp])
-    detail_result.to_csv("./data/yes24/yes24_best_detail.csv", index=False)
+    detail_result.to_csv("./yes24/yes24_best_detail.csv", index=False)
     return detail_result
 
 def to_db(df):
@@ -120,6 +122,24 @@ def to_db(df):
     conn = engine.raw_connection()
     df.to_sql('yes24_final_fn', con=conn, if_exists='append')
     print("데이터베이스 저장 완료                     ")
+
+
+def to_mysql(df, db_name, table_name):
+    """
+    df: dataframe
+    db_name: db_name
+    table_name: table_name
+    """
+    from sqlalchemy import create_engine
+    engine = create_engine(f"mysql+mysqldb://{dbid}:{dbpw}@localhost/{db_name}", encoding='utf-8')
+    conn = engine.connect()
+    try:
+        df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
+    except Exception as e:
+        print(e)
+        conn.close()
+    return print("DB saving has been completed")
+
 
 if __name__ == "__main__":
     pass
