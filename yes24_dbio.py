@@ -6,7 +6,7 @@ import pandas as pd  # 데이터 프레임 만듬
 from tqdm import tqdm
 import sqlite3
 from sqlalchemy import create_engine
-import dbinfo
+from dbinfo import *
 
 
 # book_list에서 책 1권의 정보를 추출하는 함수
@@ -131,14 +131,17 @@ def to_mysql(df, db_name, table_name):
     table_name: table_name
     """
     from sqlalchemy import create_engine
-    engine = create_engine(f"mysql+mysqldb://{dbid}:{dbpw}@localhost/{db_name}", encoding='utf-8')
+    import pymysql
+    pymysql.install_as_MySQLdb()
+
+    engine = create_engine(f"mysql+mysqldb://{dbid}:{dbpw}@59.7.246.88:33060/{db_name}")
     conn = engine.connect()
     try:
         df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
     except Exception as e:
         print(e)
         conn.close()
-    return print("DB saving has been completed")
+    return print("DB saving has been completed", end="\r")
 
 
 if __name__ == "__main__":
